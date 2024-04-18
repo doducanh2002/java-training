@@ -1,0 +1,67 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="20241104-0844-user-profile-table" author="DucAnh">
+        <createTable tableName="user_profile">
+            <column name="user_id" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="UQ_username_userprofile"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20241104-0844-post-table" author="DucAnh">
+        <createTable tableName="post">
+            <column name="post_id" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)"/>
+            <column name="created_at" type="timestamp"/>
+            </createTable>
+        <addForeignKeyConstraint baseTableName="post" baseColumnNames="user_id"
+                                     constraintName="FK_post_user_profile"
+                                     referencedTableName="user_profile" referencedColumnNames="user_id"/>
+    </changeSet>
+
+    <changeSet id="20241104-0850-image-table" author="DucAnh">
+        <createTable tableName="image">
+            <column name="image_id" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="url" type="varchar(255)"/>
+            <column name="caption" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20241104-0844-image-post-table" author="DucAnh">
+        <createTable tableName="image_post">
+            <column name="id" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="post_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_id" type="varchar(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="image_post" baseColumnNames="post_id"
+                                 constraintName="FK_image_post_post"
+                                 referencedTableName="post" referencedColumnNames="post_id"/>
+        <addForeignKeyConstraint baseTableName="image_post" baseColumnNames="image_id"
+                                 constraintName="FK_image_post_image"
+                                 referencedTableName="image" referencedColumnNames="image_id"/>
+    </changeSet>
+</databaseChangeLog>
