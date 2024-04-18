@@ -3,6 +3,7 @@ package org.aibles.privatetraining.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aibles.privatetraining.dto.request.UserProfileRequest;
+import org.aibles.privatetraining.dto.request.UserRequest;
 import org.aibles.privatetraining.dto.response.Response;
 import org.aibles.privatetraining.service.UserProfileService;
 import org.springframework.http.HttpStatus;
@@ -56,4 +57,17 @@ public class UserProfileController {
     return Response.of(HttpStatus.OK.value(), service.getAll());
   }
 
+
+  @GetMapping("/login")
+  public Response authenticate(@RequestBody UserRequest userRequest) {
+    return Response.of(HttpStatus.OK.value(), service.login(userRequest));
+
+  }
+
+  @GetMapping("/register")
+  public Response register(@RequestBody UserRequest userRequest) {
+    log.info("(register)userRequest: {}", userRequest);
+    service.register(userRequest);
+    return Response.of(HttpStatus.CREATED.value(),"User registered successfully");
+  }
 }

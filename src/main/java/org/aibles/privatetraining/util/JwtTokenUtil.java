@@ -3,17 +3,14 @@ package org.aibles.privatetraining.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
-@AllArgsConstructor
 public class JwtTokenUtil {
 
     @Value("${jwt.secret}")
@@ -27,8 +24,6 @@ public class JwtTokenUtil {
 
     @Value("${jwt.refreshTokenExpiration}")
     private Long refreshTokenExpiration;
-
-    private final PasswordEncoder passwordEncoder;
 
     private String generateToken(UserDetails userDetails, Long expiration) {
         return Jwts.builder()
@@ -73,7 +68,11 @@ public class JwtTokenUtil {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public boolean validatePassword(UserDetails userDetails, String rawPassword) {
-        return passwordEncoder.matches(rawPassword, userDetails.getPassword());
+    public Long getAccessTokenExpiration(String token) {
+        return accessTokenExpiration;
+    }
+
+    public Long getRefreshTokenExpiration(String token) {
+        return refreshTokenExpiration;
     }
 }

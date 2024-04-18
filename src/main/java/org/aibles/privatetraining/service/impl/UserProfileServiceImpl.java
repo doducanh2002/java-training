@@ -7,23 +7,18 @@ import org.aibles.privatetraining.dto.response.AuthenticationResponse;
 import org.aibles.privatetraining.dto.response.UserProfileResponse;
 import org.aibles.privatetraining.entity.Role;
 import org.aibles.privatetraining.entity.UserProfile;
-import org.aibles.privatetraining.exception.EmailAlreadyExistedException;
-import org.aibles.privatetraining.exception.UserNotFoundException;
-import org.aibles.privatetraining.exception.UsernameAlreadyExistedException;
+import org.aibles.privatetraining.exception.*;
 import org.aibles.privatetraining.repository.UserProfileRepository;
 import org.aibles.privatetraining.service.JwtUserDetailsService;
 import org.aibles.privatetraining.service.UserProfileService;
 import org.aibles.privatetraining.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,13 +27,15 @@ import java.util.stream.Collectors;
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
 
+    @Autowired
     private final UserProfileRepository repository;
     @Autowired
     private UserProfileRepository userProfileRepository;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();;
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
     public UserProfileServiceImpl(UserProfileRepository repository) {
@@ -57,7 +54,6 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfileResponse getById(String id) {
-        log.info("(getOrderById)id: {}", id);
         var user =
                 repository
                         .findById(id)
@@ -96,27 +92,34 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfile register(UserRequest userRequest) {
+        checkUsername(userRequest.getUsername());
         UserProfile newUser = new UserProfile();
         newUser.setUsername(userRequest.getUsername());
         newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        newUser.setRoles(Role.USER);
+        newUser.setRole(Role.USER);
         return userProfileRepository.save(newUser);
     }
 
 
     @Override
-    public AuthenticationResponse authenticate(UserRequest userRequest) throws Exception {
+    public AuthenticationResponse login(UserRequest userRequest) {
+        if (!repository.existsByUsername(userRequest.getUsername())) {
+            throw new UsernameNotFoundException(userRequest.getUsername());
+        }
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(userRequest.getUsername());
-
-        if (!jwtTokenUtil.validatePassword(userDetails, userRequest.getPassword())) {
-            throw new Exception("Incorrect username or password");
+        if (!validatePassword(userDetails, userRequest.getPassword())) {
+            throw new PasswordIncorrect(userRequest.getPassword());
         }
 
         final String accessToken = jwtTokenUtil.generateAccessToken(userDetails);
         final String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
+        final long accessTokenExpiration = jwtTokenUtil.getAccessTokenExpiration(accessToken);
+        final long refreshTokenExpiration = jwtTokenUtil.getRefreshTokenExpiration(refreshToken);
 
-        return new AuthenticationResponse(accessToken, refreshToken);
+        return new AuthenticationResponse(accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration);
     }
+
+
 
 
     @Override
@@ -151,6 +154,20 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (repository.existsByUsername(username)) {
             throw new UsernameAlreadyExistedException(username);
         }
+    }
+
+    public boolean validatePassword(UserDetails userDetails, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, userDetails.getPassword());
+    }
+
+    @Override
+    public UserProfileResponse getByUsername(String username) {
+        log.info("(getByUsername)username: {}", username);
+        var user = repository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        return UserProfileResponse.from(user);
     }
 
 }

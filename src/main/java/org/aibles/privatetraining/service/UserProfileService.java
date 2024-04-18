@@ -16,7 +16,7 @@ public interface UserProfileService {
 
   UserProfile register(UserRequest userRequest);
 
-  AuthenticationResponse authenticate(UserRequest userRequest) throws Exception;
+  AuthenticationResponse login(UserRequest userRequest);
 
   void changePassword(String username, String newPassword);
 
@@ -26,5 +26,7 @@ public interface UserProfileService {
   void checkUserId(String userId);
 
   List<UserProfileResponse> getAll();
+  UserProfileResponse getByUsername(String username);
+
 
 }

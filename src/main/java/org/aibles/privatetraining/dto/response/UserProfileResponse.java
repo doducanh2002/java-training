@@ -23,7 +23,7 @@ public class UserProfileResponse {
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setPassword(user.getPassword());
-        response.setRole(user.getRoles());
+        response.setRole(user.getRole());
 
         return response;
     }

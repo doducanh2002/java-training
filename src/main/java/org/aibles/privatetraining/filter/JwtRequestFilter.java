@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aibles.privatetraining.service.UserProfileService;
 import org.aibles.privatetraining.util.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -47,17 +46,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         var jwtToken = accessToken.substring(7);
-        String userId;
+        String username;
         try {
-            userId = jwtTokenUtil.extractUsername(jwtToken);
+            username = jwtTokenUtil.extractUsername(jwtToken);
         } catch (Exception ex) {
             ex.printStackTrace();
             filterChain.doFilter(request, response);
             return ;
         }
 
-        if (Objects.nonNull(userId) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
-            var user = userProfileService.getById(userId);
+        if (Objects.nonNull(username) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
+            var user = userProfileService.getByUsername(username);
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     user.getUsername(), user.getPassword(), Collections.emptyList());
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
