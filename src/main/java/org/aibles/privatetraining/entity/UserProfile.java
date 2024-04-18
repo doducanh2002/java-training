@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.aibles.privatetraining.dto.request.UserProfileRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor(staticName = "of")
@@ -22,6 +23,12 @@ public class UserProfile {
 
   @Column(name = "email", nullable = false)
   private String email;
+
+  @Column(nullable = false)
+  private String password;
+
+  @Column(nullable = false)
+  private Role roles;
 
   @PrePersist
   private void prePersistId() {
