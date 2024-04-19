@@ -12,3 +12,11 @@ jwt:
   expiration: 3600000
   accessTokenExpiration: 1800000
   refreshTokenExpiration: 86400000
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
