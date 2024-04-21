@@ -132,6 +132,9 @@ public class UserProfileServiceImpl implements UserProfileService {
     public void verifyOTP(ActiveOTPRequest request) {
         String cachedOTP = getCachedOTPFromRedis(request.getUsername()); // Lấy OTP từ Redis
         if (!request.getOtp().equals(cachedOTP)) {
+            UserProfile userProfile = userProfileRepository.findByUsername(request.getUsername());
+            userProfile.setIsActive(true); // Cập nhật trường isActive thành true
+            userProfileRepository.save(userProfile); // Lưu thay đổi vào cơ sở dữ liệu
             redisTemplate.delete(request.getUsername()); // Xóa OTP khỏi Redis
         } else {
             throw new InvalidOTPException();
