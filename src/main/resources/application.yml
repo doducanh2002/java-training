@@ -5,6 +5,23 @@ spring:
     url: jdbc:postgresql://localhost:5432/test
     username: postgres
     password: 123456
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username:
+    password:
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
+    template:
+      name: mail-template.html
+
 server:
   port: 8900
 jwt:

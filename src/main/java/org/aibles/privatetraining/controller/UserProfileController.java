@@ -2,6 +2,8 @@ package org.aibles.privatetraining.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aibles.privatetraining.dto.request.ActiveOTPRequest;
+import org.aibles.privatetraining.dto.request.SendOTPRequest;
 import org.aibles.privatetraining.dto.request.UserProfileRequest;
 import org.aibles.privatetraining.dto.request.UserRequest;
 import org.aibles.privatetraining.dto.response.Response;
@@ -45,7 +47,7 @@ public class UserProfileController {
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.CREATED)
   public Response update(@PathVariable String id, @Validated @RequestBody UserProfileRequest request) {
-    log.info("(create)request: {}", request);
+    log.info("(update)request: {}", request);
     return Response.of(
             HttpStatus.CREATED.value(),
             service.updateUser(id,request));
@@ -59,15 +61,30 @@ public class UserProfileController {
 
 
   @GetMapping("/login")
-  public Response authenticate(@RequestBody UserRequest userRequest) {
+  public Response authenticate(@Validated @RequestBody UserRequest userRequest) {
     return Response.of(HttpStatus.OK.value(), service.login(userRequest));
 
   }
 
   @GetMapping("/register")
-  public Response register(@RequestBody UserRequest userRequest) {
+  public Response register(@Validated @RequestBody UserRequest userRequest) {
     log.info("(register)userRequest: {}", userRequest);
     service.register(userRequest);
     return Response.of(HttpStatus.CREATED.value(),"User registered successfully");
+  }
+
+  @GetMapping("/send_otp")
+  @ResponseStatus(HttpStatus.OK)
+  public Response sendOTP(@Validated @RequestBody SendOTPRequest request) {
+    service.sendOTP(request);
+    return Response.of(HttpStatus.OK.value(), "Send OTP successfully");
+  }
+
+
+  @GetMapping("/active")
+  @ResponseStatus(HttpStatus.OK)
+  public Response active(@Validated @RequestBody ActiveOTPRequest request) {
+    service.verifyOTP(request);
+    return Response.of(HttpStatus.OK.value(), "Active successfully");
   }
 }

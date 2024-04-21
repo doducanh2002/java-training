@@ -1,6 +1,8 @@
 package org.aibles.privatetraining.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aibles.privatetraining.dto.request.ActiveOTPRequest;
+import org.aibles.privatetraining.dto.request.SendOTPRequest;
 import org.aibles.privatetraining.dto.request.UserProfileRequest;
 import org.aibles.privatetraining.dto.request.UserRequest;
 import org.aibles.privatetraining.dto.response.AuthenticationResponse;
@@ -9,10 +11,13 @@ import org.aibles.privatetraining.entity.Role;
 import org.aibles.privatetraining.entity.UserProfile;
 import org.aibles.privatetraining.exception.*;
 import org.aibles.privatetraining.repository.UserProfileRepository;
+import org.aibles.privatetraining.service.EmailService;
 import org.aibles.privatetraining.service.JwtUserDetailsService;
 import org.aibles.privatetraining.service.UserProfileService;
+import org.aibles.privatetraining.util.EmailValidator;
 import org.aibles.privatetraining.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -33,9 +39,13 @@ public class UserProfileServiceImpl implements UserProfileService {
     private UserProfileRepository userProfileRepository;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private EmailService emailService;
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
-    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();;
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
     public UserProfileServiceImpl(UserProfileRepository repository) {
@@ -88,18 +98,55 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .collect(Collectors.toList());
     }
 
-
-
+    @Transactional
     @Override
     public UserProfile register(UserRequest userRequest) {
-        checkUsername(userRequest.getUsername());
+        if (!EmailValidator.isValidEmail(userRequest.getEmail())) {
+            throw new BadRequestException();
+        }
+
+        // Create UserProfile object and save to repository
         UserProfile newUser = new UserProfile();
         newUser.setUsername(userRequest.getUsername());
         newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         newUser.setRole(Role.USER);
+        newUser.setEmail(userRequest.getEmail());
+        newUser.setIsActive(false);
         return userProfileRepository.save(newUser);
     }
 
+    @Override
+    public void sendOTP(SendOTPRequest request){
+        if (!EmailValidator.isValidEmail(request.getEmail())) {
+            throw new BadRequestException();
+        }
+        String otp = emailService.generateOTP();
+
+        // Send OTP to the provided email
+        emailService.sendOTP(request.getEmail(), otp);
+        saveOTPToRedis(request.getUsername(), otp);
+
+    }
+
+    @Override
+    public void verifyOTP(ActiveOTPRequest request) {
+        String cachedOTP = getCachedOTPFromRedis(request.getUsername()); // Lấy OTP từ Redis
+        if (!request.getOtp().equals(cachedOTP)) {
+            redisTemplate.delete(request.getUsername()); // Xóa OTP khỏi Redis
+        } else {
+            throw new InvalidOTPException();
+        }
+    }
+
+
+    private String getCachedOTPFromRedis(String username) {
+        log.info("(getCachedOTPFromRedis)username: {}",username);
+        return redisTemplate.opsForValue().get(username);
+    }
+
+    private void saveOTPToRedis(String username, String otp) {
+        redisTemplate.opsForValue().set(username, otp, 2, TimeUnit.MINUTES); // Lưu trong Redis với thời gian hết hạn 2 phút
+    }
 
     @Override
     public AuthenticationResponse login(UserRequest userRequest) {
@@ -118,9 +165,6 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         return new AuthenticationResponse(accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration);
     }
-
-
-
 
     @Override
     public void changePassword(String username, String newPassword) {

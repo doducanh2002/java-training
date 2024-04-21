@@ -20,7 +20,7 @@ public class UserProfile {
   @Column(name = "username", nullable = false)
   private String username;
 
-  @Column(name = "email")
+  @Column(name = "email", nullable = false)
   private String email;
 
   @Column(name = "password",nullable = false)
@@ -28,6 +28,9 @@ public class UserProfile {
 
   @Column(name = "role",nullable = false)
   private Role role;
+
+  @Column(name = "isActive",nullable = false)
+  private Boolean isActive;
 
   @PrePersist
   private void prePersistId() {
