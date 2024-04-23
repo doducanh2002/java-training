@@ -2,10 +2,7 @@ package org.aibles.privatetraining.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aibles.privatetraining.dto.request.ActiveOTPRequest;
-import org.aibles.privatetraining.dto.request.SendOTPRequest;
-import org.aibles.privatetraining.dto.request.UserProfileRequest;
-import org.aibles.privatetraining.dto.request.UserRequest;
+import org.aibles.privatetraining.dto.request.*;
 import org.aibles.privatetraining.dto.response.Response;
 import org.aibles.privatetraining.service.UserProfileService;
 import org.springframework.http.HttpStatus;
@@ -61,8 +58,8 @@ public class UserProfileController {
 
 
   @GetMapping("/login")
-  public Response authenticate(@Validated @RequestBody UserRequest userRequest) {
-    return Response.of(HttpStatus.OK.value(), service.login(userRequest));
+  public Response authenticate(@Validated @RequestBody LoginRequest request) {
+    return Response.of(HttpStatus.OK.value(), service.login(request));
 
   }
 
@@ -87,4 +84,11 @@ public class UserProfileController {
     service.verifyOTP(request);
     return Response.of(HttpStatus.OK.value(), "Active successfully");
   }
+
+  @GetMapping("/search")
+  public Response searchUsers(@RequestParam(required = false) String username,
+                                               @RequestParam(required = false) String email) {
+    return Response.of(HttpStatus.OK.value(), service.searchUserProfile(username,email));
+  }
+
 }

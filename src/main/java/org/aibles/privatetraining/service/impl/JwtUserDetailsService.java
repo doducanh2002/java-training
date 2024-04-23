@@ -1,4 +1,4 @@
-package org.aibles.privatetraining.service;
+package org.aibles.privatetraining.service.impl;
 
 import org.aibles.privatetraining.entity.UserProfile;
 import org.aibles.privatetraining.repository.UserProfileRepository;

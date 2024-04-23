@@ -1,11 +1,9 @@
 package org.aibles.privatetraining.service;
 
-import org.aibles.privatetraining.dto.request.ActiveOTPRequest;
-import org.aibles.privatetraining.dto.request.SendOTPRequest;
-import org.aibles.privatetraining.dto.request.UserProfileRequest;
-import org.aibles.privatetraining.dto.request.UserRequest;
+import org.aibles.privatetraining.dto.request.*;
 import org.aibles.privatetraining.dto.response.AuthenticationResponse;
 import org.aibles.privatetraining.dto.response.UserProfileResponse;
+import org.aibles.privatetraining.dto.response.UserResponse;
 import org.aibles.privatetraining.entity.UserProfile;
 
 import java.util.List;
@@ -22,7 +20,7 @@ public interface UserProfileService {
 
   void verifyOTP(ActiveOTPRequest request);
 
-  AuthenticationResponse login(UserRequest userRequest);
+  AuthenticationResponse login(LoginRequest request);
 
   void changePassword(String username, String newPassword);
 
@@ -31,8 +29,8 @@ public interface UserProfileService {
   void delete(String userId);
   void checkUserId(String userId);
 
-  List<UserProfileResponse> getAll();
+  List<UserResponse> getAll();
   UserProfileResponse getByUsername(String username);
 
-
+  List<UserResponse> searchUserProfile(String username, String email);
 }

@@ -74,4 +74,12 @@ public class ImageServiceImpl implements ImageService {
                 .map(ImageResponse::from)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<ImageResponse> searchImage(String url, String caption) {
+        List<Image> images = repository.searchImage(url, caption);
+        return images.stream()
+                .map(ImageResponse::from)
+                .collect(Collectors.toList());
+    }
 }

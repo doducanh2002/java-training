@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aibles.privatetraining.dto.request.PostRequest;
 import org.aibles.privatetraining.dto.response.PostResponse;
 import org.aibles.privatetraining.entity.Post;
-import org.aibles.privatetraining.exception.ImageNotFoundException;
 import org.aibles.privatetraining.exception.PostNotFoundException;
 import org.aibles.privatetraining.repository.PostRepository;
 import org.aibles.privatetraining.service.PostService;
@@ -76,6 +75,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostResponse> getAllPosts() {
         List<Post> posts = repository.findAll();
+        return posts.stream()
+                .map(PostResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostResponse> searchPost(String userId, String title, String content) {
+        List<Post> posts = repository.searchPost(userId, title, content);
         return posts.stream()
                 .map(PostResponse::from)
                 .collect(Collectors.toList());

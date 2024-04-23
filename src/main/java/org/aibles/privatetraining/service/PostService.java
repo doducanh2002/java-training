@@ -18,4 +18,6 @@ public interface PostService {
     void checkPostId(String postId);
 
     List<PostResponse> getAllPosts();
+
+    List<PostResponse> searchPost(String userId, String title, String content);
 }
