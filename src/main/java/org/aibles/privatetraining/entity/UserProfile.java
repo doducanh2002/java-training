@@ -23,6 +23,15 @@ public class UserProfile {
   @Column(name = "email", nullable = false)
   private String email;
 
+  @Column(name = "password",nullable = false)
+  private String password;
+
+  @Column(name = "role",nullable = false)
+  private Role role;
+
+  @Column(name = "isActive",nullable = false)
+  private Boolean isActive;
+
   @PrePersist
   private void prePersistId() {
     this.userId = this.userId== null ? UUID.randomUUID().toString() : this.userId;

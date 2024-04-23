@@ -5,5 +5,35 @@ spring:
     url: jdbc:postgresql://localhost:5432/test
     username: postgres
     password: 123456
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username:
+    password:
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
+    template:
+      name: mail-template.html
+
 server:
   port: 8900
+jwt:
+  secret: your_secret_key
+  expiration: 3600000
+  accessTokenExpiration: 1800000
+  refreshTokenExpiration: 86400000
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
