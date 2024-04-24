@@ -85,7 +85,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public void checkUserId(String userId) {
-        if (repository.existsById(userId)) {
+        if (!repository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
     }
@@ -105,7 +105,6 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new BadRequestException();
         }
 
-        // Create UserProfile object and save to repository
         UserProfile newUser = new UserProfile();
         newUser.setUsername(userRequest.getUsername());
         newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));

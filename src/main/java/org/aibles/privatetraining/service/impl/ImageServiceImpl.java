@@ -62,7 +62,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void checkImageId(String imageId) {
-        if (repository.existsById(imageId)) {
+        if (!repository.existsById(imageId)) {
             throw new ImageNotFoundException(imageId);
         }
     }

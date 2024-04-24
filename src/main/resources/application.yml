@@ -23,7 +23,7 @@ spring:
       name: mail-template.html
 
 server:
-  port: 8900
+  port: 8901
 jwt:
   secret: your_secret_key
   expiration: 3600000
