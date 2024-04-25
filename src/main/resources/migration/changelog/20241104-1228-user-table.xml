@@ -90,6 +90,32 @@
                                  constraintName="FK_user"
                                  referencedTableName="user_profile" referencedColumnNames="user_id"/>
     </changeSet>
+    <changeSet id="20242404-1301-comment-table" author="DucAnh">
+        <createTable tableName="comment">
+            <column name="id" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="post_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+
+        </createTable>
+        <addForeignKeyConstraint baseTableName="comment" baseColumnNames="post_id"
+                                 constraintName="FK_post"
+                                 referencedTableName="post" referencedColumnNames="post_id"/>
+        <addForeignKeyConstraint baseTableName="comment" baseColumnNames="user_id"
+                                 constraintName="FK_user"
+                                 referencedTableName="user_profile" referencedColumnNames="user_id"/>
+    </changeSet>
+
 
 
 

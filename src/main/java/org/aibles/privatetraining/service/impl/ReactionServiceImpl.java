@@ -47,6 +47,7 @@ public class ReactionServiceImpl implements ReactionService {
     @Override
     public ReactionResponse getReactionById(String postId,String id) {
         log.info("(getReactionById) ID: {}", id);
+        postService.checkPostId(postId);
         Reaction reaction = repository.findById(id)
                                 .orElseThrow(() -> new ReactionNotFoundException(id));
         return ReactionResponse.from(reaction);
@@ -56,6 +57,7 @@ public class ReactionServiceImpl implements ReactionService {
     @Transactional
     public ReactionResponse updateReaction(String postId, String id, ReactionRequest reactionRequest) {
         log.info("(updateReaction) ID: {}, Request: {}", id, reactionRequest);
+        postService.checkPostId(postId);
         Reaction reaction = repository.findById(id)
                 .orElseThrow(() -> new ReactionNotFoundException(id));
         reaction.setReactionType(reactionRequest.getReactionType());
@@ -66,6 +68,7 @@ public class ReactionServiceImpl implements ReactionService {
     @Override
     public void deleteReaction(String postId, String reactionId) {
         log.info("(deleteReaction) ID: {}", reactionId);
+        postService.checkPostId(postId);
         checkReactionId(reactionId);
         repository.deleteById(reactionId);
     }
@@ -79,6 +82,7 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public List<ReactionResponse> searchReaction(String postId) {
+        postService.checkPostId(postId);
         List<Reaction> reactions = repository.findAllByPostId(postId);
         log.info("list: {}", reactions);
         return reactions.stream()
