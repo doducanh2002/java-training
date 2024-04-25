@@ -14,9 +14,6 @@ public class ReactionRequest {
     @NotBlank(message = "Reaction type must not be blank.")
     private String reactionType;
 
-    @NotBlank(message = "Post ID must not be blank.")
-    private String postId;
-
     @NotBlank(message = "User ID must not be blank.")
     private String userId;
 }

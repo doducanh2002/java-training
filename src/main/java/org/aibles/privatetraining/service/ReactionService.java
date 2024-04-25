@@ -7,17 +7,15 @@ import java.util.List;
 
 public interface ReactionService {
 
-    ReactionResponse createReaction(ReactionRequest reactionRequest);
+    ReactionResponse createReaction(String postId,ReactionRequest reactionRequest);
 
-    ReactionResponse getReactionById(String id);
+    ReactionResponse getReactionById(String postId,String id);
 
-    ReactionResponse updateReaction(String id, ReactionRequest reactionRequest);
+    ReactionResponse updateReaction(String postId,String id, ReactionRequest reactionRequest);
 
-    void deleteReaction(String reactionId);
+    void deleteReaction(String postId,String reactionId);
 
     void checkReactionId(String reactionId);
-
-    List<ReactionResponse> getAllReactions();
 
     List<ReactionResponse> searchReaction(String postId);
 

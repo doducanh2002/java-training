@@ -12,54 +12,47 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/v1/reactions")
+@RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class ReactionController {
 
     private final ReactionService reactionService;
 
-    @PostMapping
+    @PostMapping("/{post_id}/reactions")
     @ResponseStatus(HttpStatus.CREATED)
-    public Response createReaction(@Validated @RequestBody ReactionRequest request) {
-        log.info("(createReaction) Request: {}", request);
+    public Response createReaction(@Validated @PathVariable("post_id")String postId, @RequestBody ReactionRequest request) {
+        log.info("(createReaction) Request: {}, postId: {}", request, postId);
         return Response.of(
                 HttpStatus.CREATED.value(),
-                reactionService.createReaction(request));
+                reactionService.createReaction(postId,request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{post_id}/reactions/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Response deleteReaction(@PathVariable String id) {
-        reactionService.deleteReaction(id);
+    public Response deleteReaction(@PathVariable("post_id") String postId,@PathVariable("id") String id) {
+        reactionService.deleteReaction(postId,id);
         return Response.of(
                 HttpStatus.OK.value(),
                 "Delete reaction successfully");
     }
 
-    @GetMapping("/{id}")
-    public Response getReactionById(@PathVariable String id) {
+    @GetMapping("/{post_id}/reactions/{id}")
+    public Response getReactionById(@PathVariable("post_id")String postId,@PathVariable("id") String id) {
         log.info("(getReactionById) ID: {}", id);
-        return Response.of(HttpStatus.OK.value(), reactionService.getReactionById(id));
+        return Response.of(HttpStatus.OK.value(), reactionService.getReactionById(postId,id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{post_id}/reactions/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Response updateReaction(@PathVariable String id, @Validated @RequestBody ReactionRequest request) {
+    public Response updateReaction(@PathVariable("post_id")String postId, @PathVariable("id") String id, @Validated @RequestBody ReactionRequest request) {
         log.info("(updateReaction) ID: {}, Request: {}", id, request);
         return Response.of(
                 HttpStatus.CREATED.value(),
-                reactionService.updateReaction(id, request));
+                reactionService.updateReaction(postId,id, request));
     }
 
-    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public Response getAll(){
-        return Response.of(HttpStatus.OK.value(), reactionService.getAllReactions());
-    }
-
-
-    @GetMapping("/search")
-    public Response search(@RequestParam(required = false) String postId){
+    @GetMapping("/{post_id}/reactions")
+    public Response search(@PathVariable("post_id") String postId){
         return Response.of(HttpStatus.OK.value(), reactionService.searchReaction(postId));
     }
 }

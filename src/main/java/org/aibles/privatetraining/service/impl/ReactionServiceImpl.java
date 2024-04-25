@@ -33,19 +33,19 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public ReactionResponse createReaction(ReactionRequest reactionRequest) {
+    public ReactionResponse createReaction(String postId, ReactionRequest reactionRequest) {
         log.info("(createReaction) Request: {}", reactionRequest);
         userProfileService.checkUserId(reactionRequest.getUserId());
-        postService.checkPostId(reactionRequest.getPostId());
+        postService.checkPostId(postId);
         Reaction reaction = Reaction.of(reactionRequest);
-        reaction.setPostId(reactionRequest.getPostId());
+        reaction.setPostId(postId);
         reaction.setUserId(reactionRequest.getUserId());
         repository.save(reaction);
         return ReactionResponse.from(reaction);
     }
 
     @Override
-    public ReactionResponse getReactionById(String id) {
+    public ReactionResponse getReactionById(String postId,String id) {
         log.info("(getReactionById) ID: {}", id);
         Reaction reaction = repository.findById(id)
                                 .orElseThrow(() -> new ReactionNotFoundException(id));
@@ -54,7 +54,7 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     @Transactional
-    public ReactionResponse updateReaction(String id, ReactionRequest reactionRequest) {
+    public ReactionResponse updateReaction(String postId, String id, ReactionRequest reactionRequest) {
         log.info("(updateReaction) ID: {}, Request: {}", id, reactionRequest);
         Reaction reaction = repository.findById(id)
                 .orElseThrow(() -> new ReactionNotFoundException(id));
@@ -64,7 +64,7 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public void deleteReaction(String reactionId) {
+    public void deleteReaction(String postId, String reactionId) {
         log.info("(deleteReaction) ID: {}", reactionId);
         checkReactionId(reactionId);
         repository.deleteById(reactionId);
@@ -75,14 +75,6 @@ public class ReactionServiceImpl implements ReactionService {
         if (!repository.existsById(reactionId)) {
             throw new ReactionNotFoundException(reactionId);
         }
-    }
-
-    @Override
-    public List<ReactionResponse> getAllReactions() {
-        List<Reaction> reactions = repository.findAll();
-        return reactions.stream()
-                .map(ReactionResponse::from)
-                .collect(Collectors.toList());
     }
 
     @Override
