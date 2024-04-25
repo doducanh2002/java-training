@@ -18,4 +18,6 @@ public interface ImageService {
     void checkImageId(String imageId);
 
     List<ImageResponse> getAllImages();
+
+    List<ImageResponse> searchImage(String url, String caption);
 }

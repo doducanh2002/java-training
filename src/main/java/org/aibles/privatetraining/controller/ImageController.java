@@ -56,4 +56,10 @@ public class ImageController {
     public Response getAll(){
         return Response.of(HttpStatus.OK.value(), imageService.getAllImages());
     }
+
+    @GetMapping("/search")
+    public Response search(@RequestParam(required = false) String url,
+                           @RequestParam(required = false) String caption) {
+        return Response.of(HttpStatus.OK.value(), imageService.searchImage(url,caption));
+    }
 }

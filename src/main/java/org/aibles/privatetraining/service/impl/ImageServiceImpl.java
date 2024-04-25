@@ -62,7 +62,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void checkImageId(String imageId) {
-        if (repository.existsById(imageId)) {
+        if (!repository.existsById(imageId)) {
             throw new ImageNotFoundException(imageId);
         }
     }
@@ -71,6 +71,14 @@ public class ImageServiceImpl implements ImageService {
     public List<ImageResponse> getAllImages() {
         List<Image> image = repository.findAll();
         return image.stream()
+                .map(ImageResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImageResponse> searchImage(String url, String caption) {
+        List<Image> images = repository.searchImage(url, caption);
+        return images.stream()
                 .map(ImageResponse::from)
                 .collect(Collectors.toList());
     }

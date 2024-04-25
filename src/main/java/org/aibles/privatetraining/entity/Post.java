@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.aibles.privatetraining.dto.request.PostRequest;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -27,8 +28,8 @@ public class Post {
   private String title;
 
   @CreatedDate
-  @Column(name = "create_at")
-  private Long createdAt;
+  @Column(name = "created_at")
+  private LocalDateTime createdAt;
 
 
   @PrePersist

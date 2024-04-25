@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aibles.privatetraining.dto.request.PostRequest;
 import org.aibles.privatetraining.dto.response.PostResponse;
 import org.aibles.privatetraining.entity.Post;
-import org.aibles.privatetraining.exception.ImageNotFoundException;
 import org.aibles.privatetraining.exception.PostNotFoundException;
 import org.aibles.privatetraining.repository.PostRepository;
 import org.aibles.privatetraining.service.PostService;
@@ -13,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class PostServiceImpl implements PostService {
         log.info("(createPost) Request: {}", postRequest);
         userProfileService.checkUserId(postRequest.getUserId());
         Post post = Post.of(postRequest);
+        post.setCreatedAt(LocalDateTime.now());
         repository.save(post);
         return PostResponse.from(post);
     }
@@ -68,7 +70,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void checkPostId(String postId) {
-        if (repository.existsById(postId)) {
+        if (!repository.existsById(postId)) {
             throw new PostNotFoundException(postId);
         }
     }
@@ -76,6 +78,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostResponse> getAllPosts() {
         List<Post> posts = repository.findAll();
+        return posts.stream()
+                .map(PostResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostResponse> searchPost(String userId, String title, String content) {
+        List<Post> posts = repository.searchPost(userId, title, content);
         return posts.stream()
                 .map(PostResponse::from)
                 .collect(Collectors.toList());

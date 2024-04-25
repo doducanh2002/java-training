@@ -1,18 +1,15 @@
 package org.aibles.privatetraining.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.aibles.privatetraining.dto.request.ActiveOTPRequest;
-import org.aibles.privatetraining.dto.request.SendOTPRequest;
-import org.aibles.privatetraining.dto.request.UserProfileRequest;
-import org.aibles.privatetraining.dto.request.UserRequest;
+import org.aibles.privatetraining.dto.request.*;
 import org.aibles.privatetraining.dto.response.AuthenticationResponse;
 import org.aibles.privatetraining.dto.response.UserProfileResponse;
+import org.aibles.privatetraining.dto.response.UserResponse;
 import org.aibles.privatetraining.entity.Role;
 import org.aibles.privatetraining.entity.UserProfile;
 import org.aibles.privatetraining.exception.*;
 import org.aibles.privatetraining.repository.UserProfileRepository;
 import org.aibles.privatetraining.service.EmailService;
-import org.aibles.privatetraining.service.JwtUserDetailsService;
 import org.aibles.privatetraining.service.UserProfileService;
 import org.aibles.privatetraining.util.EmailValidator;
 import org.aibles.privatetraining.util.JwtTokenUtil;
@@ -48,36 +45,39 @@ public class UserProfileServiceImpl implements UserProfileService {
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+
     public UserProfileServiceImpl(UserProfileRepository repository) {
         this.repository = repository;
     }
 
     @Override
     public UserProfileResponse createUser(UserProfileRequest request) {
-      log.info("(createUser)request :{}", request);
-      checkEmail(request.getEmail());
-      checkUsername(request.getUsername());
-      UserProfile userProfile = UserProfile.of(request);
-      repository.save(userProfile);
-      return UserProfileResponse.from(userProfile);
-  }
+        log.info("(createUser)request :{}", request);
+        checkEmail(request.getEmail());
+        checkUsername(request.getUsername());
+        UserProfile userProfile = UserProfile.of(request);
+        repository.save(userProfile);
+        return UserProfileResponse.from(userProfile);
+    }
 
     @Override
     public UserProfileResponse getById(String id) {
         var user =
                 repository
                         .findById(id)
-                        .orElseThrow(() -> {throw new UserNotFoundException(id);});
+                        .orElseThrow(() -> {
+                            throw new UserNotFoundException(id);
+                        });
         return UserProfileResponse.from(user);
     }
 
 
     @Transactional
     @Override
-    public void delete(String id){
+    public void delete(String id) {
         log.info("(delete)id: {}", id);
         repository.findById(id);
-        if(!repository.existsById(id)){
+        if (!repository.existsById(id)) {
             throw new UserNotFoundException(id);
         }
         repository.deleteById(id);
@@ -85,16 +85,16 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public void checkUserId(String userId) {
-        if (repository.existsById(userId)) {
+        if (!repository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
     }
 
     @Override
-    public List<UserProfileResponse> getAll() {
+    public List<UserResponse> getAll() {
         List<UserProfile> userProfiles = repository.findAll();
         return userProfiles.stream()
-                .map(UserProfileResponse::from)
+                .map(UserResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -105,7 +105,6 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new BadRequestException();
         }
 
-        // Create UserProfile object and save to repository
         UserProfile newUser = new UserProfile();
         newUser.setUsername(userRequest.getUsername());
         newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
@@ -116,7 +115,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public void sendOTP(SendOTPRequest request){
+    public void sendOTP(SendOTPRequest request) {
         if (!EmailValidator.isValidEmail(request.getEmail())) {
             throw new BadRequestException();
         }
@@ -143,7 +142,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
 
     private String getCachedOTPFromRedis(String username) {
-        log.info("(getCachedOTPFromRedis)username: {}",username);
+        log.info("(getCachedOTPFromRedis)username: {}", username);
         return redisTemplate.opsForValue().get(username);
     }
 
@@ -152,13 +151,13 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public AuthenticationResponse login(UserRequest userRequest) {
-        if (!repository.existsByUsername(userRequest.getUsername())) {
-            throw new UsernameNotFoundException(userRequest.getUsername());
+    public AuthenticationResponse login(LoginRequest request) {
+        if (!repository.existsByUsername(request.getUsername())) {
+            throw new UsernameNotFoundException(request.getUsername());
         }
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(userRequest.getUsername());
-        if (!validatePassword(userDetails, userRequest.getPassword())) {
-            throw new PasswordIncorrect(userRequest.getPassword());
+        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(request.getUsername());
+        if (!validatePassword(userDetails, request.getPassword())) {
+            throw new PasswordIncorrect(request.getPassword());
         }
 
         final String accessToken = jwtTokenUtil.generateAccessToken(userDetails);
@@ -191,13 +190,13 @@ public class UserProfileServiceImpl implements UserProfileService {
         return UserProfileResponse.from(user);
     }
 
-    void checkEmail(String email){
+    void checkEmail(String email) {
         if (repository.existsByEmail(email)) {
             throw new EmailAlreadyExistedException(email);
         }
     }
 
-    void checkUsername(String username){
+    void checkUsername(String username) {
         if (repository.existsByUsername(username)) {
             throw new UsernameAlreadyExistedException(username);
         }
@@ -217,4 +216,13 @@ public class UserProfileServiceImpl implements UserProfileService {
         return UserProfileResponse.from(user);
     }
 
+    @Override
+    public List<UserResponse> searchUserProfile(String username, String email) {
+        List<UserProfile> userProfiles = userProfileRepository.searchUserProfile(username, email);
+        return userProfiles.stream()
+                .map(UserResponse::from)
+                .collect(Collectors.toList());
+    }
+
 }
+

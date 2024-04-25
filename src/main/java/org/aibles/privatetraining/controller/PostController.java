@@ -56,4 +56,11 @@ public class PostController {
     public Response getAll(){
         return Response.of(HttpStatus.OK.value(), postService.getAllPosts());
     }
+
+    @GetMapping("/search")
+    public Response search(@RequestParam(required = false) String userId,
+                                @RequestParam(required = false) String title,
+                                @RequestParam(required = false) String content) {
+        return Response.of(HttpStatus.OK.value(), postService.searchPost(userId,title,content));
+    }
 }

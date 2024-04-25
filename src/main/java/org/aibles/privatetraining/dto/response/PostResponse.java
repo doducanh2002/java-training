@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.aibles.privatetraining.entity.Image;
 import org.aibles.privatetraining.entity.Post;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +16,7 @@ public class PostResponse {
     private String userId;
     private String content;
     private String title;
-    private Long createdAt;
+    private LocalDateTime createdAt;
 
     public static PostResponse from(Post post) {
         PostResponse response = new PostResponse();
