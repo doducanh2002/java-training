@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface ReactionService {
 
-    ReactionResponse createReaction(String postId,ReactionRequest reactionRequest);
+    ReactionResponse createReaction(String userId, String postId,ReactionRequest reactionRequest);
 
     ReactionResponse getReactionById(String postId,String id);
 
-    ReactionResponse updateReaction(String postId,String id, ReactionRequest reactionRequest);
+    ReactionResponse updateReaction(String userId, String postId,String id, ReactionRequest reactionRequest);
 
     void deleteReaction(String postId,String reactionId);
 

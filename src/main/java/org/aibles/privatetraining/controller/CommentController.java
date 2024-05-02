@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static org.aibles.privatetraining.util.SecurityService.getUserId;
+
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/posts")
@@ -24,7 +26,7 @@ public class CommentController {
         log.info("(createComment) Request: {}, postId: {}", request, postId);
         return Response.of(
                 HttpStatus.CREATED.value(),
-                commentService.createComment(postId, request));
+                commentService.createComment(getUserId(), postId, request));
     }
 
     @DeleteMapping("/{post_id}/comments/{comment_id}")
@@ -48,7 +50,7 @@ public class CommentController {
         log.info("(updateComment) ID: {}, Request: {}", commentId, request);
         return Response.of(
                 HttpStatus.CREATED.value(),
-                commentService.updateComment(postId, commentId, request));
+                commentService.updateComment(getUserId(),postId, commentId, request));
     }
 
     @GetMapping("/{post_id}/comments")

@@ -13,7 +13,4 @@ public class CommentRequest {
 
     @NotBlank(message = "Content type must not be blank.")
     private String content;
-
-    @NotBlank(message = "User ID must not be blank.")
-    private String userId;
 }

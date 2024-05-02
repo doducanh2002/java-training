@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static org.aibles.privatetraining.util.SecurityService.getUserId;
+
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/posts")
@@ -24,7 +26,7 @@ public class ReactionController {
         log.info("(createReaction) Request: {}, postId: {}", request, postId);
         return Response.of(
                 HttpStatus.CREATED.value(),
-                reactionService.createReaction(postId,request));
+                reactionService.createReaction(getUserId(),postId,request));
     }
 
     @DeleteMapping("/{post_id}/reactions/{id}")
@@ -48,7 +50,7 @@ public class ReactionController {
         log.info("(updateReaction) ID: {}, Request: {}", id, request);
         return Response.of(
                 HttpStatus.CREATED.value(),
-                reactionService.updateReaction(postId,id, request));
+                reactionService.updateReaction(getUserId(),postId,id, request));
     }
 
     @GetMapping("/{post_id}/reactions")

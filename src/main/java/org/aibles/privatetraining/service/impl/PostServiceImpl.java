@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,11 +29,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse createPost(PostRequest postRequest) {
-        log.info("(createPost) Request: {}", postRequest);
-        userProfileService.checkUserId(postRequest.getUserId());
-        Post post = Post.of(postRequest);
-        post.setCreatedAt(LocalDateTime.now());
+    public PostResponse createPost(String userId, String content, String title, String parentId) {
+        log.info("(createPost) content: {}, title: {}, parent: {}", content, title, parentId);
+        Post post = Post.of(userId, content, parentId, title);
         repository.save(post);
         return PostResponse.from(post);
     }
@@ -50,9 +46,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public PostResponse updatePost(String id, PostRequest postRequest) {
+    public PostResponse updatePost(String userId, String id, PostRequest postRequest) {
         log.info("(updatePost) ID: {}, Request: {}", id, postRequest);
-        userProfileService.checkUserId(postRequest.getUserId());
         Post post = repository.findById(id)
                              .orElseThrow(() -> new PostNotFoundException(id));
         post.setContent(postRequest.getContent());

@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface CommentService {
 
-    CommentResponse createComment(String postId, CommentRequest commentRequest);
+    CommentResponse createComment(String userId,String postId, CommentRequest commentRequest);
 
     CommentResponse getCommentById(String postId, String commentId);
 
-    CommentResponse updateComment(String postId, String commentId, CommentRequest commentRequest);
+    CommentResponse updateComment(String userId, String postId, String commentId, CommentRequest commentRequest);
 
     void deleteComment(String postId, String commentId);
 

@@ -33,13 +33,12 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public ReactionResponse createReaction(String postId, ReactionRequest reactionRequest) {
+    public ReactionResponse createReaction(String userId, String postId, ReactionRequest reactionRequest) {
         log.info("(createReaction) Request: {}", reactionRequest);
-        userProfileService.checkUserId(reactionRequest.getUserId());
         postService.checkPostId(postId);
         Reaction reaction = Reaction.of(reactionRequest);
         reaction.setPostId(postId);
-        reaction.setUserId(reactionRequest.getUserId());
+        reaction.setUserId(userId);
         repository.save(reaction);
         return ReactionResponse.from(reaction);
     }
@@ -55,7 +54,7 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     @Transactional
-    public ReactionResponse updateReaction(String postId, String id, ReactionRequest reactionRequest) {
+    public ReactionResponse updateReaction(String userId, String postId, String id, ReactionRequest reactionRequest) {
         log.info("(updateReaction) ID: {}, Request: {}", id, reactionRequest);
         postService.checkPostId(postId);
         Reaction reaction = repository.findById(id)

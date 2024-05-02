@@ -34,13 +34,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentResponse createComment(String postId, CommentRequest commentRequest) {
+    public CommentResponse createComment(String userId,String postId, CommentRequest commentRequest) {
         log.info("(createComment) postId: {}, commentRequest: {}", postId, commentRequest);
-        userProfileService.checkUserId(commentRequest.getUserId());
         postService.checkPostId(postId);
         Comment comment = Comment.of(commentRequest);
         comment.setPostId(postId);
-        comment.setUserId(comment.getUserId());
+        comment.setUserId(userId);
         commentRepository.save(comment);
         return CommentResponse.from(comment);
     }
@@ -55,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentResponse updateComment(String postId, String commentId, CommentRequest commentRequest) {
+    public CommentResponse updateComment(String userId, String postId, String commentId, CommentRequest commentRequest) {
         log.info("(updateComment) postId: {}, commentId: {}, commentRequest: {}", postId, commentId, commentRequest);
         postService.checkPostId(postId);
         Comment comment = commentRepository.findByIdAndPostId(commentId, postId)

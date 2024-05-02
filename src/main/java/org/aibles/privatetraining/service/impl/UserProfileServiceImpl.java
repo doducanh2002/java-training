@@ -43,8 +43,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     private RedisTemplate<String, String> redisTemplate;
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+//    @Autowired
+//    private JwtUserDetailsService jwtUserDetailsService;
 
     public UserProfileServiceImpl(UserProfileRepository repository) {
         this.repository = repository;
@@ -155,7 +155,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (!repository.existsByUsername(request.getUsername())) {
             throw new UsernameNotFoundException(request.getUsername());
         }
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(request.getUsername());
+        UserProfile userDetails = repository.findByUsername(request.getUsername());
         if (!validatePassword(userDetails, request.getPassword())) {
             throw new PasswordIncorrect(request.getPassword());
         }
@@ -202,7 +202,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
     }
 
-    public boolean validatePassword(UserDetails userDetails, String rawPassword) {
+    public boolean validatePassword(UserProfile userDetails, String rawPassword) {
         return passwordEncoder.matches(rawPassword, userDetails.getPassword());
     }
 

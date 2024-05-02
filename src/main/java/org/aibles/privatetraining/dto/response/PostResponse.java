@@ -1,5 +1,6 @@
 package org.aibles.privatetraining.dto.response;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import org.aibles.privatetraining.entity.Image;
 import org.aibles.privatetraining.entity.Post;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
