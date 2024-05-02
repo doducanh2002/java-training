@@ -18,6 +18,7 @@ public class PostResponse {
     private String userId;
     private String content;
     private String title;
+    private List<ImageResponse> imageUrls; // Danh sách các URL của ảnh
     private LocalDateTime createdAt;
 
     public static PostResponse from(Post post) {
@@ -27,6 +28,17 @@ public class PostResponse {
         response.setPostId(post.getPostId());
         response.setUserId(post.getUserId());
         response.setTitle(post.getTitle());
+        return response;
+    }
+
+    public static PostResponse from(Post post, List<ImageResponse> imageUrls) {
+        PostResponse response = new PostResponse();
+        response.setContent(post.getContent());
+        response.setCreatedAt(post.getCreatedAt());
+        response.setPostId(post.getPostId());
+        response.setUserId(post.getUserId());
+        response.setTitle(post.getTitle());
+        response.setImageUrls(imageUrls);
         return response;
     }
 }

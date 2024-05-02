@@ -4,13 +4,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.aibles.privatetraining.dto.request.ImageRequest;
 import org.aibles.privatetraining.dto.response.ImageResponse;
 import org.aibles.privatetraining.entity.Image;
+import org.aibles.privatetraining.exception.BadRequestException;
 import org.aibles.privatetraining.exception.ImageNotFoundException;
 import org.aibles.privatetraining.repository.ImageRepository;
 import org.aibles.privatetraining.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +25,9 @@ import java.util.stream.Collectors;
 public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository repository;
+
+    @Value("${image.value}")
+    private Path fileStorageLocation;
 
     @Autowired
     public ImageServiceImpl(ImageRepository repository) {
@@ -82,4 +91,18 @@ public class ImageServiceImpl implements ImageService {
                 .map(ImageResponse::from)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Image upload(MultipartFile multipartFile) {
+        log.info("(save)multipartFile : {}", multipartFile);
+        try {
+            Path targetLocation = fileStorageLocation.resolve(multipartFile.getOriginalFilename());
+            Files.copy(multipartFile.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            return repository.save(Image.of(multipartFile.getOriginalFilename(), targetLocation.toString()));
+        } catch (Exception ex) {
+            log.error("(save)exception : {} --> Bad request", ex.getClass().getSimpleName());
+            throw new BadRequestException();
+        }
+    }
+
 }

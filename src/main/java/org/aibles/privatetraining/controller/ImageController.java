@@ -9,6 +9,7 @@ import org.aibles.privatetraining.service.ImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -61,5 +62,14 @@ public class ImageController {
     public Response search(@RequestParam(required = false) String url,
                            @RequestParam(required = false) String caption) {
         return Response.of(HttpStatus.OK.value(), imageService.searchImage(url,caption));
+    }
+
+    @GetMapping("/testup")
+    @ResponseStatus(HttpStatus.OK)
+    public Response uploadFile(
+            @RequestParam(name = "file", required = false) MultipartFile file) {
+        log.info("(uploadFile)fileName: {}", file.getOriginalFilename());
+        return Response.of(HttpStatus.OK.value(), imageService.upload(file));
+
     }
 }

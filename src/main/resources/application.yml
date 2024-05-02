@@ -21,6 +21,8 @@ spring:
     test-connection: false
     template:
       name: mail-template.html
+image:
+  value: /home/ducanh/Downloads
 
 server:
   port: 8901

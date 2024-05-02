@@ -2,6 +2,8 @@ package org.aibles.privatetraining.service;
 
 import org.aibles.privatetraining.dto.request.ImageRequest;
 import org.aibles.privatetraining.dto.response.ImageResponse;
+import org.aibles.privatetraining.entity.Image;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,4 +22,6 @@ public interface ImageService {
     List<ImageResponse> getAllImages();
 
     List<ImageResponse> searchImage(String url, String caption);
+
+    Image upload(MultipartFile multipartFile);
 }
