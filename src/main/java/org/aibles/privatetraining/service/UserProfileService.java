@@ -2,6 +2,7 @@ package org.aibles.privatetraining.service;
 
 import org.aibles.privatetraining.dto.request.*;
 import org.aibles.privatetraining.dto.response.AuthenticationResponse;
+import org.aibles.privatetraining.dto.response.ForgotPasswordResponse;
 import org.aibles.privatetraining.dto.response.UserProfileResponse;
 import org.aibles.privatetraining.dto.response.UserResponse;
 import org.aibles.privatetraining.entity.UserProfile;
@@ -23,6 +24,8 @@ public interface UserProfileService {
   AuthenticationResponse login(LoginRequest request);
 
   void changePassword(String username, String newPassword);
+
+  void forgotPassword(ForgotPasswordRequest request);
 
   UserProfileResponse updateUser(String id, UserProfileRequest userProfileRequest);
 

@@ -3,6 +3,7 @@ package org.aibles.privatetraining.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.aibles.privatetraining.dto.request.*;
 import org.aibles.privatetraining.dto.response.AuthenticationResponse;
+import org.aibles.privatetraining.dto.response.ForgotPasswordResponse;
 import org.aibles.privatetraining.dto.response.UserProfileResponse;
 import org.aibles.privatetraining.dto.response.UserResponse;
 import org.aibles.privatetraining.entity.Role;
@@ -15,7 +16,6 @@ import org.aibles.privatetraining.util.EmailValidator;
 import org.aibles.privatetraining.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -176,6 +176,18 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
+    public void forgotPassword(ForgotPasswordRequest request) {
+        log.info("(forgotPassword)username :{}, otp: {}, password:{} ", request.getUsername(), request.getOtp(), request.getPassword());
+        String cachedOTP = getCachedOTPFromRedis(request.getUsername()); // Lấy OTP từ Redis
+        if (request.getOtp().equals(cachedOTP)) {
+            changePassword(request.getUsername(), request.getPassword());
+            redisTemplate.delete(request.getUsername()); // Xóa OTP khỏi Redis
+        } else {
+            throw new InvalidOTPException();
+        }
+    }
+
+    @Override
     @Transactional
     public UserProfileResponse updateUser(String id, UserProfileRequest userProfileRequest) {
         log.info("(updateUser) id: {}, userProfileRequest: {}", id, userProfileRequest);
@@ -193,6 +205,12 @@ public class UserProfileServiceImpl implements UserProfileService {
     void checkEmail(String email) {
         if (repository.existsByEmail(email)) {
             throw new EmailAlreadyExistedException(email);
+        }
+    }
+
+    void checkEmailNotFound(String email) {
+        if (!repository.existsByEmail(email)) {
+            throw new EmailNotFoundException(email);
         }
     }
 

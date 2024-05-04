@@ -91,4 +91,10 @@ public class UserProfileController {
     return Response.of(HttpStatus.OK.value(), service.searchUserProfile(username,email));
   }
 
+  @GetMapping("/forgot-password")
+  @ResponseStatus(HttpStatus.OK)
+  public Response forgotPassword(@Validated @RequestBody ForgotPasswordRequest request) {
+    service.forgotPassword(request);
+    return Response.of(HttpStatus.OK.value(), "Success");
+  }
 }
