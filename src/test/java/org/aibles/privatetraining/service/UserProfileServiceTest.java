@@ -8,6 +8,8 @@ import org.aibles.privatetraining.entity.UserProfile;
 import org.aibles.privatetraining.exception.BadRequestException;
 import org.aibles.privatetraining.exception.InvalidOTPException;
 import org.aibles.privatetraining.exception.UserNotFoundException;
+import org.aibles.privatetraining.exception.UsernameNotFoundException;
+import org.aibles.privatetraining.filter.JwtRequestFilter;
 import org.aibles.privatetraining.repository.UserProfileRepository;
 import org.aibles.privatetraining.util.EmailValidator;
 import org.aibles.privatetraining.util.JwtTokenUtil;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,15 +43,13 @@ public class UserProfileServiceTest {
     private JwtTokenUtil jwtTokenUtil;
 
     @MockBean
+    private JwtRequestFilter jwtRequestFilter;
+
+    @MockBean
     private EmailService emailService;
 
-    @Mock
+    @MockBean
     private RedisTemplate<String, String> redisTemplate;
-//    private RedisTemplate<String, String> redisTemplate;
-
-
-//    @InjectMocks
-//    private UserProfileServiceImpl userProfileService;
 
     private PasswordEncoder passwordEncoder;
 
@@ -181,9 +182,9 @@ public class UserProfileServiceTest {
     public void test_GetByUsername_NotFound() {
         String username = "invalidUsername";
 
-        Mockito.when(userProfileRepository.findByUsername(username)).thenReturn(mockUserProfileEntity());
+        Mockito.when(userProfileRepository.findByUsername(username)).thenReturn(null);
 
-        Assertions.assertThrows(UserNotFoundException.class, () -> userProfileService.getByUsername(username));
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> userProfileService.getByUsername(username));
     }
 
     @Test
@@ -193,6 +194,7 @@ public class UserProfileServiceTest {
         userRequest.setPassword("password");
         userRequest.setEmail("test@example.com");
 
+        Mockito.mockStatic(EmailValidator.class);
         Mockito.when(EmailValidator.isValidEmail(userRequest.getEmail())).thenReturn(true);
         Mockito.when(userProfileRepository.save(ArgumentMatchers.any(UserProfile.class))).thenAnswer(invocation -> {
             UserProfile userProfile = invocation.getArgument(0);
@@ -215,7 +217,7 @@ public class UserProfileServiceTest {
         userRequest.setUsername("testuser");
         userRequest.setPassword("password");
         userRequest.setEmail("invalid-email");
-
+        Mockito.mockStatic(EmailValidator.class);
         Mockito.when(EmailValidator.isValidEmail(userRequest.getEmail())).thenReturn(false);
 
         Assertions.assertThrows(BadRequestException.class, () -> userProfileService.register(userRequest));
@@ -228,13 +230,17 @@ public class UserProfileServiceTest {
         request.setUsername("testuser");
         String otp = "123456";
 
+        Mockito.mockStatic(EmailValidator.class);
         Mockito.when(EmailValidator.isValidEmail(request.getEmail())).thenReturn(true);
         Mockito.when(emailService.generateOTP()).thenReturn(otp);
+
+        ValueOperations<String, String> valueOperations = Mockito.mock(ValueOperations.class);
+        Mockito.when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
         userProfileService.sendOTP(request);
 
         Mockito.verify(emailService).sendOTP(request.getEmail(), otp);
-        Mockito.verify(redisTemplate).opsForValue().set(request.getUsername(), otp, 2, TimeUnit.MINUTES);
+        Mockito.verify(valueOperations).set(request.getUsername(), otp, 2, TimeUnit.MINUTES);
     }
 
     @Test
@@ -243,7 +249,11 @@ public class UserProfileServiceTest {
         request.setEmail("invalid-email");
         request.setUsername("testuser");
 
+        Mockito.mockStatic(EmailValidator.class);
         Mockito.when(EmailValidator.isValidEmail(request.getEmail())).thenReturn(false);
+
+        ValueOperations<String, String> valueOperations = Mockito.mock(ValueOperations.class);
+        Mockito.when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
         Assertions.assertThrows(BadRequestException.class, () -> userProfileService.sendOTP(request));
     }
@@ -254,7 +264,9 @@ public class UserProfileServiceTest {
         Integer otp = 123456;
         ActiveOTPRequest request = new ActiveOTPRequest(username, otp);
 
-        Mockito.when(redisTemplate.opsForValue().get(username)).thenReturn(String.valueOf(otp));
+        ValueOperations<String, String> valueOperations = Mockito.mock(ValueOperations.class);
+        Mockito.when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        Mockito.when(valueOperations.get(username)).thenReturn(String.valueOf(otp));
 
         userProfileService.verifyOTP(request);
 
@@ -263,6 +275,7 @@ public class UserProfileServiceTest {
         Mockito.verify(redisTemplate).delete(username);
     }
 
+
     @Test
     public void test_VerifyOTP_Invalid() {
         String username = "testuser";
@@ -270,7 +283,9 @@ public class UserProfileServiceTest {
         Integer invalidOtp = 654321;
         ActiveOTPRequest request = new ActiveOTPRequest(username, invalidOtp);
 
-        Mockito.when(redisTemplate.opsForValue().get(username)).thenReturn(String.valueOf(otp));
+        ValueOperations<String, String> valueOperations = Mockito.mock(ValueOperations.class);
+        Mockito.when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        Mockito.when(valueOperations.get(username)).thenReturn(String.valueOf(otp));
 
         Assertions.assertThrows(InvalidOTPException.class, () -> userProfileService.verifyOTP(request));
     }

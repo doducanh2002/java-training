@@ -25,7 +25,7 @@ public class CommentController {
     @ResponseStatus(HttpStatus.CREATED)
     public CommentResponse createComment(@Validated @PathVariable("post_id") String postId, @RequestBody CommentRequest request) {
         log.info("(createComment) Request: {}, postId: {}", request, postId);
-        return commentService.createComment(getUserId(), postId, request);
+        return commentService.createComment("userId", postId, request);
     }
 
     @DeleteMapping("/{post_id}/comments/{comment_id}")

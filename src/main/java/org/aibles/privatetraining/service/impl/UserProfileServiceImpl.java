@@ -101,6 +101,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional
     @Override
     public UserProfile register(UserRequest userRequest) {
+        log.info("(register)userRequest: {}", userRequest);
         if (!EmailValidator.isValidEmail(userRequest.getEmail())) {
             throw new BadRequestException();
         }
@@ -132,6 +133,9 @@ public class UserProfileServiceImpl implements UserProfileService {
         String cachedOTP = getCachedOTPFromRedis(request.getUsername()); // Lấy OTP từ Redis
         if (!request.getOtp().equals(cachedOTP)) {
             UserProfile userProfile = userProfileRepository.findByUsername(request.getUsername());
+            if (userProfile == null) {
+                throw new InvalidOTPException(); // Ném ra ngoại lệ nếu userProfile không tồn tại
+            }
             userProfile.setIsActive(true); // Cập nhật trường isActive thành true
             userProfileRepository.save(userProfile); // Lưu thay đổi vào cơ sở dữ liệu
             redisTemplate.delete(request.getUsername()); // Xóa OTP khỏi Redis
@@ -139,6 +143,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new InvalidOTPException();
         }
     }
+
 
 
     private String getCachedOTPFromRedis(String username) {
