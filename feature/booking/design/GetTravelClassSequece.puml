@@ -1,0 +1,63 @@
+@startuml
+actor Client
+participant "Controller" as Controller
+participant "GetTravelClassUseCase" as UseCase
+participant "TravelClassRepository" as Repository
+participant "TravelClassLocalDatasource" as Datasource
+entity "TravelClassDatabaseEntity" as Database
+
+Client-> Controller : call api get news list
+note right Client
+HttpMethod: GET
+Path: /api/v1/travel-classes
+end note
+activate Controller
+
+Controller -> UseCase : call function invoke()
+activate UseCase
+
+UseCase -> Repository : call function getTravelClassList()
+activate Repository
+
+Repository -> Datasource : call
+Datasource -> Database: call function get data by filter
+
+Database -> Database: query to get data
+Database --> Datasource : return data
+
+Datasource --> Repository : return databaseEntity
+Repository -> Repository: convert databaseEntity to entity
+Repository --> UseCase: return entity
+UseCase-> UseCase: convert entity into response
+
+deactivate Repository
+
+UseCase --> Controller : return response
+deactivate UseCase
+
+Controller --> Client: Response 200 OK
+note left Controller
+Body{
+"timestamp": 12348284,
+"code": "success",
+"data": [
+{
+"id": 1,
+"title": "News Title 1",
+"lastUpdatedAt": "2024-06-04",
+"lastUpdatedBy": "author"
+"status": 1
+},
+{
+"id": 2,
+"title": "News Title 2",
+"content": "Content of the news 2...",
+"lastUpdatedAt": "2024-06-04",
+"lastUpdatedBy": "author"
+"status": 1
+}
+]
+}
+end note
+deactivate Controller
+@enduml

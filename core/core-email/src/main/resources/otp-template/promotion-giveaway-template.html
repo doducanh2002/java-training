@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #dddddd;
+    }
+    .header {
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 10px 10px 0 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .content {
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .content h3 {
+      font-size: 20px;
+      color: #007bff;
+    }
+    .details {
+      background-color: #f1f9ff;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    .details p {
+      margin: 5px 0;
+    }
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    AMS PROMOTION GIVEAWAY
+  </div>
+  <div class="content">
+    <h3>Congratulations!</h3>
+    <p>You have been selected to receive a special promotion from AMS AIRLINE.</p>
+    <div class="details">
+      <p><strong>Promotion Code:</strong> <span th:text="${code}"></span></p>
+      <p><strong>Description:</strong> <span th:text="${description}"></span></p>
+      <p><strong>Expiration Date:</strong> <span th:text="${expiredDate}"></span></p>
+      <p th:if="${discountPercent != null}">
+        <strong>Discount:</strong> <span th:text="${discountPercent}"></span>%
+      </p>
+      <p th:if="${plusMiles != null}">
+        <strong>Bonus Miles:</strong> <span th:text="${plusMiles}"></span>
+      </p>
+    </div>
+    <p>Please redeem your promotion before the expiration date.</p>
+  </div>
+  <div class="footer">
+    Thank you for choosing AMS AIRLINE!<br>
+    Enjoy your exclusive benefits.
+  </div>
+</div>
+</body>
+</html>

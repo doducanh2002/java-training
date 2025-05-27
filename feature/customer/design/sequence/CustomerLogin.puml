@@ -1,0 +1,154 @@
+@startuml
+participant "Front End" as fe
+participant "AuthController" as controller
+participant "LoginUseCase" as login
+participant "CustomerRepository" as repository
+participant "EncryptionUtils" as encrypt
+participant "JwtService" as jwt
+participant "RedisService" as redis
+fe -> controller ++: Call API login
+note left controller
+  METHOD: POST
+  PATH: /api/v1/customer/login
+  RequestBody: {
+    username: "sample username",
+    password: "sample password"
+  }
+end note
+controller -> controller: Validate input
+note right controller
+  - username is required
+  - password is required
+  - Using Spring validation to handle this
+end note
+alt Input invalid
+  controller --> fe: response invalid request
+  note left controller
+    HttpStatus: 400
+    Response body: {
+      code: "invalid_request",
+      timestamp: 1232167523,
+      error: [
+        { field: "username", message: "username is required" },
+        { field: "password", message: "password is required" }
+      ]
+    }
+  end note
+else Valid input
+  controller -> login --++: Call function invoke(username, password)
+  login -> repository: Call function getCustomer(username)
+  repository --> login: response Optional<Customer>
+  alt customer is null
+    login -> fe: response customer not exist to fe via throw exception
+    note left login
+      - Login usecase throw exception customer not found
+      - System handle exception and response to "Front End" automatically
+      HttpStatus: 404
+      Response: {
+        code: "not_found",
+        timestamp: 1232167523
+      }
+    end note
+  else customer exist
+    login -> login: Check valid password
+    group check valid password
+      login -> encrypt ++: call encrypt(password)
+      encrypt --> login --: return encrypted password: String
+      login -> login: compare encryptedPassword with customer.password
+      alt encryptedPassword not equal with customer.password
+        login -> redis ++: incrementFailedLoginAttempts(username)
+        redis --> login --:
+        login -> redis ++: getFailedLoginAttempts(username)
+        redis --> login --: failedLoginAttempts
+        alt failedLoginAttempts >= 5
+          login -> repository ++: lockCustomerAccount(customer)
+          repository --> login --:
+          login -> redis ++: removeFailedLoginAttempts(username)
+          redis --> login --:
+          login -> fe: response account locked to fe via throw exception
+          note left login
+            - Login usecase throw exception account locked
+            - System handle exception and response to "Front End" automatically
+            HttpStatus: 400
+            Response: {
+              code: "account_locked",
+              message: "Account locked due to multiple failed login attempts.",
+              timestamp: 1232167523
+            }
+          end note
+        else
+          login -> fe: response invalid password to fe via throw exception
+          note left login
+            - Login usecase throw exception password invalid
+            - System handle exception and response to "Front End" automatically
+            HttpStatus: 400
+            Response: {
+              code: "invalid_password",
+              timestamp: 1232167523
+            }
+          end note
+        end alt
+      else encryptedPassword equal with customer.password
+        login -> redis ++: removeFailedLoginAttempts(username)
+        redis --> login --:
+        login -> login: Check account status
+        alt account status is LOCKED
+          login -> fe: response account is locked to fe via throw exception
+          note left login
+            - Login usecase checks for account status
+            - System handle exception and response automatically
+            HttpStatus: 200
+            Response: {
+              code: "account_locked",
+              message: "User is locked. Please contact support.",
+              timestamp: 1232167523
+            }
+          end note
+        else account status is NOT_ACTIVE
+          login -> fe: response account is inactive to fe
+          note left login
+            - Login usecase checks for account status
+            - HttpStatus: 200
+            Response: {
+              code: "account_inactive",
+              message: "Account is not active. Please activate your account to proceed.",
+              timestamp: 1232167523
+            }
+          end note
+        else account status is ACTIVE
+          login -> jwt ++: generateAccessAndRefreshToken(customer)
+          jwt --> login --: return Pair<String, String>
+          note right login
+            first: accessToken
+            second: refreshToken
+          end note
+          login -> redis ++: Call saveToken(accessToken, refreshToken)
+          note right redis
+            key for access token:
+              <USERNAME>-ACCESS_TOKEN
+              time to live: 10m
+            key for refresh token:
+              <USERNAME>-REFRESH_TOKEN
+              time to live: 30m
+          end note
+          redis --> login --:
+          login --> controller --++: return loginResponse
+          controller --> fe --: response success login
+          note right fe
+            HttpStatus: 200
+            Response: {
+              code: "success",
+              timestamp: 12312321,
+              data: {
+                access_token: "string",
+                refresh_token: "string",
+                access_token_expiration: 600,
+                refresh_token_expiration: 1800
+              }
+            }
+          end note
+        end alt
+    end group
+  end
+end
+@enduml

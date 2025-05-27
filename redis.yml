@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  ams-redis:
+    hostname: ${REDIS_HOST}
+    image: bitnami/redis:${REDIS_VERSION}
+    ports:
+      - "6400:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - ams-network
+networks:
+  ams-network:
+    external: true

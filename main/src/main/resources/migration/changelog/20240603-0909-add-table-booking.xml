@@ -1,0 +1,516 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+  <changeSet id="20240603-0909-add-table-airport" author="YaLynk">
+    <createTable tableName="airport">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="code" type="VARCHAR(255)"/>
+      <column name="country" type="VARCHAR(255)"/>
+      <column name="region" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-plane" author="YaLynk">
+    <createTable tableName="plane">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="model" type="VARCHAR(255)"/>
+      <column name="benefits" type="TEXT"/>
+      <column name="description" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240611-1048-add-table-benefit" author="DDanh">
+    <createTable tableName="benefit">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240611-1048-add-table-plane-benefit" author="DDanh">
+    <createTable tableName="plane_benefit">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="benefit_id" type="VARCHAR(255)"/>
+      <column name="plane_id" type="VARCHAR(255)"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="plane_benefit" baseColumnNames="benefit_id"
+      constraintName="FK_plane_benefit_benefit"
+      referencedTableName="benefit" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="plane_benefit" baseColumnNames="plane_id"
+      constraintName="FK_plane_benefit_plane"
+      referencedTableName="plane" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240615-0002-modify-plane-table" author="AnhNHS">
+    <dropColumn tableName="plane">
+      <column name="benefits"/>
+    </dropColumn>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-special-assistance" author="YaLynk">
+    <createTable tableName="special_assistance">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="description" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-travel-class" author="YaLynk">
+    <createTable tableName="travel_class">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="description" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-trip" author="YaLynk">
+    <createTable tableName="trip">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="start_date" type="BIGINT"/>
+      <column name="end_date" type="BIGINT"/>
+      <column name="departure" type="VARCHAR(255)"/>
+      <column name="arrival" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-ticket" author="YaLynk">
+    <createTable tableName="ticket">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="confirmation_code" type="VARCHAR(255)"/>
+      <column name="num_of_passenger" type="VARCHAR(255)"/>
+      <column name="customer_id" type="VARCHAR(255)"/>
+      <column name="promo_id" type="VARCHAR(255)"/>
+      <column name="trip_type" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="ticket" baseColumnNames="customer_id"
+      constraintName="FK_ticket_customer"
+      referencedTableName="customer" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20241016-2108-add-table-trip-contact" author="YaLynk">
+    <createTable tableName="trip_contact">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="primary_email" type="VARCHAR(255)"/>
+      <column name="secondary_email" type="VARCHAR(255)"/>
+      <column name="phone_number" type="VARCHAR(255)"/>
+      <column name="ticket_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="trip_contact" baseColumnNames="ticket_id"
+      constraintName="FK_trip_contact_ticket"
+      referencedTableName="ticket" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-flight" author="YaLynk">
+    <createTable tableName="flight">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="flight_number" type="VARCHAR(255)"/>
+      <column name="airline" type="VARCHAR(255)"/>
+      <column name="departure_airport_id" type="VARCHAR(255)"/>
+      <column name="arrival_airport_id" type="VARCHAR(255)"/>
+      <column name="departure_time" type="BIGINT"/>
+      <column name="arrival_time" type="BIGINT"/>
+      <column name="is_stop_station" type="BOOLEAN"/>
+      <column name="miles" type="BIGINT"/>
+      <column name="status" type="VARCHAR(255)"/>
+      <column name="plane_id" type="VARCHAR(255)"/>
+      <column name="trip_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="flight" baseColumnNames="departure_airport_id"
+      constraintName="FK_flight_departure_airport"
+      referencedTableName="airport" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="flight" baseColumnNames="arrival_airport_id"
+      constraintName="FK_flight_arrival_airport"
+      referencedTableName="airport" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="flight" baseColumnNames="plane_id"
+      constraintName="FK_flight_plane"
+      referencedTableName="plane" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="flight" baseColumnNames="trip_id"
+      constraintName="FK_flight_trip"
+      referencedTableName="trip" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-plane-travel-class" author="YaLynk">
+    <createTable tableName="plane_travel_class">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="plane_id" type="VARCHAR(255)"/>
+      <column name="travel_class_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="plane_travel_class" baseColumnNames="plane_id"
+      constraintName="FK_plane_travel_class_plane"
+      referencedTableName="plane" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="plane_travel_class" baseColumnNames="travel_class_id"
+      constraintName="FK_plane_travel_class"
+      referencedTableName="travel_class" referencedColumnNames="id"/>
+  </changeSet>
+  
+  <changeSet id="20240615-1549-modify-plane-travel-class-table" author="AnhNHS">
+    <addColumn tableName="plane_travel_class">
+      <column name="capacity" type="int"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-fare" author="YaLynk">
+    <createTable tableName="fare">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="price" type="BIGINT"/>
+      <column name="benefits" type="TEXT"/>
+      <column name="travel_class_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="fare" baseColumnNames="travel_class_id"
+      constraintName="FK_fare_travel_class"
+      referencedTableName="travel_class" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240618-1706-modify-fare-table" author="AnhNHS">
+    <addColumn tableName="fare">
+      <column name="name" type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20240611-1048-add-table-fare-benefit" author="DDanh">
+    <createTable tableName="fare_benefit">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="benefit_id" type="VARCHAR(255)"/>
+      <column name="fare_id" type="VARCHAR(255)"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="fare_benefit" baseColumnNames="benefit_id"
+      constraintName="FK_fare_benefit_benefit"
+      referencedTableName="benefit" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="fare_benefit" baseColumnNames="fare_id"
+      constraintName="FK_fare_benefit_fare"
+      referencedTableName="fare" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240615-1602-modify-fare-table" author="AnhNHS">
+    <dropColumn tableName="fare">
+      <column name="benefits"/>
+    </dropColumn>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-seat" author="YaLynk">
+    <createTable tableName="seat">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="seat_row" type="VARCHAR(255)"/>
+      <column name="seat_column" type="INTEGER"/>
+      <column name="seat_pitch" type="INTEGER"/>
+      <column name="seat_width" type="INTEGER"/>
+      <column name="plane_travel_class_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="seat" baseColumnNames="plane_travel_class_id"
+      constraintName="FK_seat_plane_travel_class"
+      referencedTableName="plane_travel_class" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240618-1140-modify-description-and-seat" author="AnhNHS">
+    <modifyDataType tableName="plane" columnName="description" newDataType="text"/>
+    <modifyDataType tableName="special_assistance" columnName="description" newDataType="text"/>
+    <modifyDataType tableName="travel_class" columnName="description" newDataType="text"/>
+    <modifyDataType tableName="seat" columnName="seat_row" newDataType="int"/>
+    <modifyDataType tableName="seat" columnName="seat_column" newDataType="varchar(255)"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-reserved-trip" author="YaLynk">
+    <createTable tableName="reserved_trip">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="fare_id" type="VARCHAR(255)"/>
+      <column name="trip_id" type="VARCHAR(255)"/>
+      <column name="ticket_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="reserved_trip" baseColumnNames="fare_id"
+      constraintName="FK_reserved_trip_fare"
+      referencedTableName="fare" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="reserved_trip" baseColumnNames="trip_id"
+      constraintName="FK_reserved_trip"
+      referencedTableName="trip" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="reserved_trip" baseColumnNames="ticket_id"
+      constraintName="FK_reserved_trip_ticket"
+      referencedTableName="ticket" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-meal" author="YaLynk">
+    <createTable tableName="meal">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="dish" type="VARCHAR(255)"/>
+      <column name="meal_time" type="BIGINT"/>
+      <column name="price" type="BIGINT"/>
+      <column name="flight_id" type="VARCHAR(255)"/>
+      <column name="reserved_trip_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="meal" baseColumnNames="flight_id"
+      constraintName="FK_meal_flight"
+      referencedTableName="flight" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="meal" baseColumnNames="reserved_trip_id"
+      constraintName="FK_meal_reserved_trip"
+      referencedTableName="reserved_trip" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-payment" author="YaLynk">
+    <createTable tableName="payment">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="amount" type="BIGINT"/>
+      <column name="payment_type" type="VARCHAR(255)"/>
+      <column name="payment_status" type="VARCHAR(255)"/>
+      <column name="ticket_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="payment" baseColumnNames="ticket_id"
+      constraintName="FK_payment_ticket"
+      referencedTableName="ticket" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-passenger-info" author="YaLynk">
+    <createTable tableName="passenger_info">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="first_name" type="VARCHAR(255)"/>
+      <column name="middle_name" type="VARCHAR(255)"/>
+      <column name="last_name" type="VARCHAR(255)"/>
+      <column name="date_of_birth" type="BIGINT"/>
+      <column name="gender" type="VARCHAR(255)"/>
+      <column name="country" type="VARCHAR(255)"/>
+      <column name="ticket_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="passenger_info" baseColumnNames="ticket_id"
+      constraintName="FK_passenger_info_ticket"
+      referencedTableName="ticket" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-reserved-seat" author="YaLynk">
+    <createTable tableName="reserved_seat">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="reserved_trip_id" type="VARCHAR(255)"/>
+      <column name="seat_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="reserved_seat" baseColumnNames="reserved_trip_id"
+      constraintName="FK_reserved_seat_reserved_trip"
+      referencedTableName="reserved_trip" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="reserved_seat" baseColumnNames="seat_id"
+      constraintName="FK_reserved_seat"
+      referencedTableName="seat" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-passenger-assistance" author="YaLynk">
+    <createTable tableName="passenger_assistance">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="passenger_id" type="VARCHAR(255)"/>
+      <column name="assistance_id" type="VARCHAR(255)"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="passenger_assistance" baseColumnNames="passenger_id"
+      constraintName="FK_passenger_assistance_passenger_info"
+      referencedTableName="passenger_info" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="passenger_assistance" baseColumnNames="assistance_id"
+      constraintName="FK_passenger_assistance_special_assistance"
+      referencedTableName="special_assistance" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240603-0909-add-table-news" author="YaLynk">
+    <createTable tableName="news">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="title" type="VARCHAR(255)"/>
+      <column name="status" type="BOOLEAN"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="BIGINT"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="BIGINT"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240621-1305-modify-data-type-of-time" author="OanhKim">
+    <modifyDataType tableName="trip" columnName="start_date" newDataType="datetime"/>
+    <modifyDataType tableName="trip" columnName="end_date" newDataType="datetime"/>
+    <modifyDataType tableName="flight" columnName="departure_time" newDataType="datetime"/>
+    <modifyDataType tableName="flight" columnName="arrival_time" newDataType="datetime"/>
+    <modifyDataType tableName="meal" columnName="meal_time" newDataType="time"/>
+    <modifyDataType tableName="passenger_info" columnName="date_of_birth" newDataType="date"/>
+  </changeSet>
+
+  <changeSet id="20240801-1800-modify-meal-module" author="AnhNHS">
+    <dropForeignKeyConstraint baseTableName="meal" constraintName="FK_meal_reserved_trip"/>
+    <dropColumn tableName="meal" columnName="reserved_trip_id"/>
+    <createTable tableName="reserved_meal">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="meal_id" type="varchar(255)"/>
+      <column name="price" type="int"/>
+      <column name="reserved_trip_id" type="varchar(255)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240812-2035-update-table-promotion" author="Daniel">
+    <createTable tableName="promotion">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="description" type="VARCHAR(255)"/>
+      <column name="type" type="VARCHAR(255)"/>
+      <column name="expired_date" type="DATETIME"/>
+      <column name="give_away_day" type="DATETIME"/>
+      <column name="discount_percent" type="INTEGER"/>
+      <column name="archived_miles" type="INTEGER"/>
+      <column name="plus_miles" type="INTEGER"/>
+      <column name="quantity" type="INTEGER"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="DATETIME"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="DATETIME"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240812-2040-readd-foreign-key-promotion" author="Daniel">
+    <addForeignKeyConstraint baseTableName="ticket" baseColumnNames="promo_id"
+      constraintName="FK_ticket_promotion"
+      referencedTableName="promotion" referencedColumnNames="id"
+      onDelete="CASCADE" onUpdate="CASCADE"/>
+  </changeSet>
+
+  <changeSet id="20240812-2330-add-column-code-to-promotion" author="Daniel">
+    <addColumn tableName="promotion">
+      <column name="code" type="VARCHAR(255)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20240813-1955-drop-column-type-to-promotion" author="Daniel">
+    <dropColumn tableName="promotion">
+      <column name="type"/>
+    </dropColumn>
+  </changeSet>
+
+  <changeSet id="20240822-2228-add-table-customer-promotion" author="YaLynk">
+    <createTable tableName="customer_promotion">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="customer_id" type="VARCHAR(255)"/>
+      <column name="promotion_id" type="VARCHAR(255)"/>
+      <column name="is_winner" type="BOOLEAN"/>
+      <column name="is_used" type="BOOLEAN"/>
+      <column name="created_by" type="VARCHAR(255)"/>
+      <column name="created_at" type="DATETIME"/>
+      <column name="last_updated_by" type="VARCHAR(255)"/>
+      <column name="last_updated_at" type="DATETIME"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240826-2011-add-foreign-key-customer-promotion" author="Daniel">
+    <addForeignKeyConstraint baseTableName="customer_promotion" baseColumnNames="customer_id"
+      constraintName="FK_customer_promotion_customer"
+      referencedTableName="customer" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="customer_promotion" baseColumnNames="promotion_id"
+      constraintName="FK_customer_promotion"
+      referencedTableName="promotion" referencedColumnNames="id"/>
+  </changeSet>
+
+
+</databaseChangeLog>

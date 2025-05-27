@@ -1,0 +1,4 @@
+application:
+  i18n:
+    resources:
+      - classpath:message

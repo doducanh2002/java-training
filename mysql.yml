@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  ams-mysql:
+    image: bitnami/mysql:${MYSQL_VERSION}
+    volumes:
+      - mysql-airport:/bitnami/mysql/data
+    environment:
+      - MYSQL_AUTHENTICATION_PLUGIN=mysql_native_password
+      - MYSQL_ROOT_USER=${DATASOURCE_USERNAME}
+      - MYSQL_ROOT_PASSWORD=${DATASOURCE_PASSWORD}
+    networks:
+      - ams-network
+  ams-mysql-dev:
+    image: bitnami/mysql:${MYSQL_VERSION}
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql-airport-dev:/bitnami/mysql/data
+    environment:
+      - MYSQL_AUTHENTICATION_PLUGIN=mysql_native_password
+      - MYSQL_ROOT_USER=${DATASOURCE_USERNAME_DEV}
+      - MYSQL_ROOT_PASSWORD=${DATASOURCE_PASSWORD_DEV}
+volumes:
+  mysql-airport:
+    driver: local
+  mysql-airport-dev:
+    driver: local
+networks:
+  ams-network:
+    external: true

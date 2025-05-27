@@ -1,0 +1,286 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+
+
+
+
+    <changeSet id="20240105-1629-add-table-customer" author="aibles">
+        <createTable tableName="customer">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(255)"/>
+            <column name="date_of_birth" type="VARCHAR(255)"/>
+            <column name="gender" type="VARCHAR(255)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="avatar" type="VARCHAR(255)"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="VARCHAR(255)"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20240603-0909-update-table-customer" author="YaLynk">
+        <dropColumn tableName="customer" columnName="name"/>
+        <addColumn tableName="customer">
+            <column name="first_name" type="VARCHAR(255)"/>
+        </addColumn>
+        <addColumn tableName="customer">
+            <column name="middle_name" type="VARCHAR(255)"/>
+        </addColumn>
+        <addColumn tableName="customer">
+            <column name="last_name" type="VARCHAR(255)"/>
+        </addColumn>
+        <modifyDataType tableName="customer" columnName="date_of_birth" newDataType="BIGINT"/>
+        <addColumn tableName="customer">
+            <column name="miles_available" type="BIGINT"/>
+        </addColumn>
+        <modifyDataType tableName="customer" columnName="created_at" newDataType="BIGINT"/>
+        <modifyDataType tableName="customer" columnName="last_updated_at" newDataType="BIGINT"/>
+    </changeSet>
+
+
+    <changeSet id="20240105-1629-add-table-account" author="aibles">
+        <createTable tableName="account">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="is_activated" type="BOOLEAN"/>
+            <column name="is_lock_permanent" type="BOOLEAN"/>
+            <column name="customer_id" type="VARCHAR(255)"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="account" baseColumnNames="customer_id"
+          constraintName="FK_customer_account"
+          referencedTableName="customer" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20240105-1629-add-table-customer-account" author="aibles">
+        <createTable tableName="customer_account">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="account_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="customer_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="customer_account" baseColumnNames="account_id"
+                                 constraintName="FK_customer_account_account"
+                                 referencedTableName="account" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="customer_account" baseColumnNames="customer_id"
+                                 constraintName="FK_customer_account_customer"
+                                 referencedTableName="customer" referencedColumnNames="id"/>
+    </changeSet>
+
+
+    <changeSet id="20240105-1629-add-table-role" author="aibles">
+        <createTable tableName="role">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20240105-1629-add-table-account-role" author="aibles">
+        <createTable tableName="account_role">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="account_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="account_role" baseColumnNames="role_id"
+                                 constraintName="FK_account_role_role"
+                                 referencedTableName="role" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="account_role" baseColumnNames="account_id"
+                                 constraintName="FK_account_role_account"
+                                 referencedTableName="account" referencedColumnNames="id"/>
+    </changeSet>
+
+
+
+
+    <changeSet id="20240105-1629-add-table-permission" author="aibles">
+        <createTable tableName="permission">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20240105-1629-add-table-role-permission" author="aibles">
+        <createTable tableName="role_permission">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="role_permission" baseColumnNames="role_id"
+                                 constraintName="FK_role_permission_role"
+                                 referencedTableName="role" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="role_permission" baseColumnNames="permission_id"
+                                 constraintName="FK_role_permission_permission"
+                                 referencedTableName="permission" referencedColumnNames="id"/>
+    </changeSet>
+
+
+
+    <changeSet id="20240105-1629-add-table-login-data" author="aibles">
+        <createTable tableName="login_data">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="account_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="login_time" type="BIGINT"/>
+            <column name="ip_address" type="VARCHAR(255)"/>
+            <column name="browser_id" type="VARCHAR(255)"/>
+            <column name="device_id" type="VARCHAR(255)"/>
+            <column name="platform" type="VARCHAR(255)"/>
+            <column name="operating_system" type="VARCHAR(255)"/>
+            <column name="success" type="BOOLEAN"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="login_data" baseColumnNames="account_id"
+                                 constraintName="FK_login_data_account"
+                                 referencedTableName="account" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20240620-0850-add-table-employee" author="YaLynk">
+        <createTable tableName="employee">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="middle_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(255)"/>
+            <column name="date_of_birth" type="BIGINT"/>
+            <column name="gender" type="VARCHAR(255)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="avatar" type="VARCHAR(255)"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20240625-1702-update-table-employee" author="YaLynk">
+        <addColumn tableName="employee">
+            <column name="is_first_login" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240702-1023-add-column-is-deleted-table-employee" author="YaLynk">
+        <addColumn tableName="employee">
+            <column name="is_deleted" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240620-0850-add-table-employee-account" author="YaLynk">
+        <createTable tableName="employee_account">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="account_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="employee_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="employee_account" baseColumnNames="account_id"
+          constraintName="FK_employee_account_account"
+          referencedTableName="account" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="employee_account" baseColumnNames="employee_id"
+          constraintName="FK_employee_account_employee"
+          referencedTableName="employee" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20240621-1305-modify-data-type-of-time" author="OanhKim">
+        <modifyDataType tableName="login_data" columnName="login_time" newDataType="datetime"/>
+        <modifyDataType tableName="employee" columnName="date_of_birth" newDataType="date"/>
+        <modifyDataType tableName="customer" columnName="date_of_birth" newDataType="date"/>
+    </changeSet>
+
+    <changeSet id="20240621-1502-add-table-api-management" author="YaLynk">
+        <createTable tableName="api_management">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="method" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="endpoint" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="permission_id" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_at" type="BIGINT"/>
+            <column name="last_updated_by" type="VARCHAR(255)"/>
+            <column name="last_updated_at" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="api_management" baseColumnNames="permission_id"
+          constraintName="FK_api_management_permission"
+          referencedTableName="permission" referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

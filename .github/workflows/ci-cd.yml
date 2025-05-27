@@ -1,0 +1,44 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+env:
+  GHCR_REPO: 'ghcr.io/aibles-java/ams'
+  CONTAINER_NAME: 'ams'
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        run : |
+          docker login ghcr.io -u ${{secrets.LOGIN_USER}} -p ${{secrets.GHCR_TOKEN}}
+
+      - name: Build and push Docker image
+        run: |
+          docker build . -t ${{ env.GHCR_REPO }}:${{ github.run_number }}
+          docker push ${{ env.GHCR_REPO }}:${{ github.run_number }}
+
+      - name: Deploy to Server
+        run: |
+          cd ${{ secrets.DOCKER_COMPOSE_PATH }}
+          export TAG=${{ github.run_number }}
+          docker rm -f ${{ env.CONTAINER_NAME }} || true
+          docker images ${{ env.GHCR_REPO }} --format '{{.ID}}' | xargs docker rmi -f || true
+          docker compose -f nginx.yml -f redis.yml -f mysql-dev.yml -f ams.yml up -d
+          
+      - name: Slack Notification
+        if: always()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.ACTION_SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
+          payload: |
+            text: "CI/CD build result:\nJob Status: ${{ job.status }}\nProject: ${{ github.repository }}"

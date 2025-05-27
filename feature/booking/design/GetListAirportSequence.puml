@@ -1,0 +1,68 @@
+@startuml
+actor User
+participant "Controller" as Controller
+participant "GetAirportUseCase" as UseCase
+participant "AirportRepository" as Repository
+participant "AirportLocalDatasource" as Datasource
+entity "AirportDatabaseEntity" as Database
+
+User -> Controller : call api get airport list
+note right User
+HttpMethod: GET
+Path: /api/v1/airports
+Request Param:
++ country: String
++ region: String (required = false)
+end note
+activate Controller
+
+Controller -> UseCase : call function invoke()
+activate UseCase
+
+UseCase -> Repository : call function getAirportList()
+activate Repository
+
+Repository -> Datasource : call
+Datasource -> Database: call function get data by filter
+note over Database
+requestParam:
++ country: findAllByCountry()
++ country, region: findAllByCountryAndRegion()
+end note
+Database -> Database: query to get data
+Database --> Datasource : return data
+
+Datasource --> Repository : return databaseEntity
+Repository -> Repository: convert databaseEntity to entity
+Repository --> UseCase: return entity
+deactivate Repository
+
+UseCase -> UseCase: convert entity into response
+UseCase --> Controller : return entity
+deactivate UseCase
+
+Controller --> User : Response 200 OK
+note left Controller
+Body{
+      "timestamp": 12348284,
+      "status": 200,
+      "data": [
+        {
+          "id":1,
+          "country": "BeBe",
+          "region": "MiMi",
+          "code": "SIL",
+          "name": "Sil"
+        },
+        {
+          "id":2,
+          "country": "Bobo",
+          "region": "MeowMeow",
+          "code": "ARB",
+          "name": "Arb"
+        }
+      ]
+}
+end note
+deactivate Controller
+@enduml

@@ -1,0 +1,112 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILE}
+  liquibase:
+    change-log: classpath:/migration/master-changelog.xml
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: ${SPRING_EMAIL_USERNAME}
+    password: ${SPRING_EMAIL_PASSWORD}
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
+  application:
+    name: airport-management-system
+  quartz:
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          jobStore:
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+
+  security:
+    oauth2:
+      resourceserver:
+        google:
+          jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+  key:
+    decrypt: ${DECRYPT_KEY}
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+application:
+  access-token:
+    secret-key: ${ACCESS_TOKEN_SECRET_KEY}
+    lifetime: ${ACCESS_TOKEN_LIFETIME}
+  refresh-token:
+    secret-key: ${REFRESH_TOKEN_SECRET_KEY}
+    lifetime: ${REFRESH_TOKEN_LIFETIME}
+  paypal:
+    client-id: ${PAYPAL_CLIENT_ID}
+    client-secret: ${PAYPAL_CLIENT_SECRET}
+    base-url: https://api-m.sandbox.paypal.com
+    tunnel-url: ${PAYPAL_TUNNEL_URL}
+    success-path: /paypal/success
+    cancel-path: /paypal/cancel
+
+  i18n:
+    resources:
+      - classpath:auth/message
+      - classpath:customer/message
+      - classpath:booking/message
+      - classpath:employee/message
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    baggage:
+      correlation:
+        enabled: true
+    enabled: false
+    propagation:
+      type: b3
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+      read-timeout: 30
+exchange-rate-api:
+  url: ${EXCHANGE_RATE_URL}
+  api-key: ${EXCHANGE_RATE_API_KEY}
+
+quartz:
+  group:
+    promotion: ${PROMOTION_GIVEAWAY}
+
+logging:
+  level:
+    io:
+      micrometer: DEBUG
+    zipkin2: DEBUG

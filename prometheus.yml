@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 1m
+  evaluation_interval: 1m
+scrape_configs:
+  - job_name: 'ams-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['ams:8080']
